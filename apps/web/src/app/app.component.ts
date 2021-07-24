@@ -11,14 +11,22 @@ import { HttpClient } from '@angular/common/http';
   `,
 })
 export class AppComponent {
-  result: unknown[] = [];
+  result: any;
 
   constructor(private readonly http: HttpClient) {}
 
   load() {
-    this.result = [
-      //
-      { hello: 'World', time: Date.now() },
-    ];
+    fetch('http://localhost:3333/api/users')
+      .then((res) => res.json())
+      .then((res) => (this.result = res));
+
+    // this.http.get('http://localhost:3333/api/users').subscribe((res) => {
+    //   this.result = res;
+    // });
+
+    // this.result = [
+    //   //
+    //   { hello: 'World', time: Date.now() },
+    // ];
   }
 }
