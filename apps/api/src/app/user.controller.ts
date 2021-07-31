@@ -9,8 +9,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-
-import { AppService } from './app.service';
+import { UserService } from './user.service';
 
 @Controller('users')
 export class UserController {
@@ -18,63 +17,48 @@ export class UserController {
     { id: 1, username: 'beeman' },
     { id: 2, username: 'jose' },
   ];
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly service: UserService) {}
 
   // GET /api/users
   @Get()
   users() {
-    return this.db;
+    return this.service.users();
   }
 
   // GET /api/users/:id
   @Get(':id')
-  user(@Param('id') id: number) {
-    id = Number(id);
-    const found = this.db.find((item) => item.id === id);
-    if (!found) {
-      throw new NotFoundException(`User with id ${id} not found!`);
-    }
-    return found;
+  user(@Param('id') id: string) {
+    return this.service.user(id);
   }
 
   @Post()
   createUser(@Body() body) {
-    const id = this.db.length + 1;
-    const username = body.username;
-    // Validation: check if username is unique
-    const found = this.db.find((item) => item.username === username);
-    if (found) {
-      throw new NotFoundException(
-        `User with username ${username} already exists!`
-      );
+    const input = {
+      email: body.email,
+      username: body.username,
+    };
+    if (!input.email) {
+      throw new BadRequestException(`You need to provide an email`);
+    }
+    if (!input.username) {
+      throw new BadRequestException(`You need to provide an username`);
     }
 
-    this.db.push({ id, username });
-
-    return this.user(id);
+    return this.service.create(input);
   }
 
   @Put(':id')
-  updateUser(@Param('id') id: number, @Body() body) {
-    const user = this.user(id);
-    const username = body.username;
-    const found = this.db.find((item) => item.username === username);
-    if (found) {
-      throw new NotFoundException(
-        `User with username ${username} already exists!`
-      );
-    }
-    const newUser = { ...user, username };
-    return {
-      before: user,
-      after: newUser,
+  updateUser(@Param('id') id: string, @Body() body) {
+    const input = {
+      email: body.email,
+      username: body.username,
     };
+
+    return this.service.update(id, input);
   }
 
   @Delete(':id')
-  deleteUser(@Param('id') id: number) {
-    const user = this.user(id);
-    this.db = this.db.filter((item) => item.id === id);
-    return user;
+  deleteUser(@Param('id') id: string) {
+    return this.service.delete(id);
   }
 }
