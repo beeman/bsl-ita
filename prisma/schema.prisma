@@ -11,7 +11,33 @@ generator client {
 }
 
 model User {
-  id       String    @id @default(cuid())
-  username String @unique
-  email    String @unique
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  username  String    @unique
+  email     String    @unique
+  courses   Course[]
+  comments  Comment[]
+}
+
+model Course {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String
+  description String?
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    String
+  comments    Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  text      String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  courseId  String
 }

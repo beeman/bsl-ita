@@ -4,19 +4,15 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Post,
   Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { UserCreateDto } from './user-create.dto';
 
 @Controller('users')
 export class UserController {
-  private db = [
-    { id: 1, username: 'beeman' },
-    { id: 2, username: 'jose' },
-  ];
   constructor(private readonly service: UserService) {}
 
   // GET /api/users
@@ -32,17 +28,17 @@ export class UserController {
   }
 
   @Post()
-  createUser(@Body() body) {
+  createUser(@Body() body: UserCreateDto) {
     const input = {
       email: body.email,
       username: body.username,
     };
-    if (!input.email) {
-      throw new BadRequestException(`You need to provide an email`);
-    }
-    if (!input.username) {
-      throw new BadRequestException(`You need to provide an username`);
-    }
+    // if (!input.email) {
+    //   throw new BadRequestException(`You need to provide an email`);
+    // }
+    // if (!input.username) {
+    //   throw new BadRequestException(`You need to provide an username`);
+    // }
 
     return this.service.create(input);
   }
